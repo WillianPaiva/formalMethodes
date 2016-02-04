@@ -1,0 +1,43 @@
+domain levels = [0,2];
+const nbSensors = 4;
+domain tankLevel = [0,nbSensors+1];
+
+
+
+node Valve
+     state
+        level : levels : public;
+        outOfOrder : bool ;
+     init
+        level := 0;
+        outOfOrder := false;
+     event inc , dec;
+     trans
+        level < 2 & ~outOfOrder |- inc -> level := level +1;
+        level < 2 & ~outOfOrder |- inc -> outOfOrder := true;
+        level > 0 & ~outOfOrder |- dec -> level := level -1;
+        level > 0 & ~outOfOrder |- dec -> outOfOrder := true;
+        outOfOrder |-inc , dec->;
+edon
+
+
+
+node Tank
+     state
+        level : tankLevel : public;
+     init level := 2;
+     event inc , dec;
+     trans
+        level < nbSensors+1 |- inc -> level := level +1;
+        level > 0 |- dec -> level := level -1;
+edon
+
+node Ctrl
+edon
+
+node System
+     sub
+        C: Ctrl;
+        T: Tank;
+        V: Valve[3];
+edon
